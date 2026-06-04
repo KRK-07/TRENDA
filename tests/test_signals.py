@@ -69,21 +69,10 @@ def test_dashboard_page_is_served() -> None:
     assert "Watchlist" in response.text
 
 
-def test_shutdown_endpoint_schedules_stop(monkeypatch) -> None:
-    called: list[bool] = []
+def test_vercel_entrypoint_exposes_app() -> None:
+    from api.index import app as vercel_app
 
-    def fake_stop_server() -> None:
-        called.append(True)
-
-    monkeypatch.setattr("trenda.main.stop_server", fake_stop_server)
-
-    client = TestClient(app)
-
-    response = client.post("/shutdown")
-
-    assert response.status_code == 200
-    assert response.json() == {"status": "shutting_down"}
-    assert called == [True]
+    assert vercel_app is app
 
 
 def test_live_market_endpoint_uses_live_snapshot(monkeypatch) -> None:

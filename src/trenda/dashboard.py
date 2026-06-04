@@ -317,7 +317,6 @@ def render_dashboard() -> str:
 
   <script>
     const pretty = (value) => JSON.stringify(value, null, 2);
-    let shutdownRequested = false;
     let refreshIntervalMs = 30000;
     let refreshTimer = null;
 
@@ -441,24 +440,6 @@ def render_dashboard() -> str:
       }
     };
 
-    const requestShutdown = () => {
-      if (shutdownRequested) {
-        return;
-      }
-      shutdownRequested = true;
-      try {
-        navigator.sendBeacon("/shutdown", new Blob([], { type: "text/plain" }));
-      } catch (error) {
-        fetch("/shutdown", { method: "POST", keepalive: true }).catch(() => {});
-      }
-    };
-
-    const confirmShutdown = () => {
-      if (window.confirm("Stop the server and close the dashboard?")) {
-        requestShutdown();
-      }
-    };
-
     const refreshLivePanels = async () => {
       if (!liveEnabled() || document.visibilityState !== "visible") {
         setRefreshStatus(liveEnabled() ? "Live polling paused while tab is hidden." : "Live polling is off.");
@@ -498,16 +479,6 @@ def render_dashboard() -> str:
     document.getElementById("clear-watchlist").addEventListener("click", () => {
       document.getElementById("watchlist").value = "";
       renderWatchlist([]);
-    });
-
-    window.addEventListener("pagehide", () => {
-      requestShutdown();
-    });
-    window.addEventListener("beforeunload", (event) => {
-      if (!shutdownRequested) {
-        event.preventDefault();
-        event.returnValue = "";
-      }
     });
 
     document.getElementById("market-form").addEventListener("submit", async (event) => {

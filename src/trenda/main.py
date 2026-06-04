@@ -1,6 +1,4 @@
-import os
-
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
 from trenda.dashboard import render_dashboard
@@ -16,12 +14,6 @@ market_data_service = MarketDataService()
 signal_service = SignalService(market_data_service)
 portfolio_service = PortfolioService(market_data_service)
 backtest_service = BacktestService(market_data_service)
-
-
-def stop_server() -> None:
-    os._exit(0)
-
-
 @app.get("/", response_class=HTMLResponse)
 def dashboard() -> str:
     return render_dashboard()
@@ -30,12 +22,6 @@ def dashboard() -> str:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
-
-
-@app.post("/shutdown")
-def shutdown(background_tasks: BackgroundTasks) -> dict[str, str]:
-    background_tasks.add_task(stop_server)
-    return {"status": "shutting_down"}
 
 
 @app.get("/market/{symbol}")
