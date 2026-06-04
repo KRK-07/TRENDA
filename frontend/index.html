@@ -381,10 +381,16 @@
     };
 
     const getWatchlistSymbols = () => {
-      const raw = document.getElementById("watchlist").value || "";
-      return Array.from(new Set(raw.split(/[,\s]+/).map((item) => item.trim().toUpperCase()).filter(Boolean)));
-\s]+/).map((item) => item.trim().toUpperCase()).filter(Boolean)));
-    };
+  const raw = document.getElementById("watchlist").value || "";
+  return Array.from(
+    new Set(
+      raw
+        .split(/[,\s]+/)
+        .map((item) => item.trim().toUpperCase())
+        .filter(Boolean)
+    )
+  );
+};
 
     const renderWatchlist = (items) => {
       if (!items || items.length === 0) {
