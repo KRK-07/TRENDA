@@ -313,7 +313,7 @@
   <script>
     const pretty = (value) => JSON.stringify(value, null, 2);
     const storageKey = "trenda-api-base-url";
-    let apiBaseUrl = (localStorage.getItem(storageKey) || "http://127.0.0.1:8000").replace(/\/+$/, "");
+    let apiBaseUrl = (localStorage.getItem(storageKey) || "https://trenda-r0au.onrender.com").replace(/\/+$/, "");
     let refreshIntervalMs = 30000;
     let refreshTimer = null;
 
