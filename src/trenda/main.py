@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+import os
 
-from trenda.dashboard import render_dashboard
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from trenda.schemas import BacktestRequest, BacktestResponse, PortfolioRequest, SignalResponse
 from trenda.services.backtest import BacktestService
 from trenda.services.market_data import MarketDataService
@@ -10,13 +10,32 @@ from trenda.services.signals import SignalService
 
 app = FastAPI(title="Trenda", version="0.1.0")
 
+allowed_origins = [
+    origin.strip()
+    for origin in os.environ.get("TRRENDA_ALLOWED_ORIGINS", "*").split(",")
+    if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 market_data_service = MarketDataService()
 signal_service = SignalService(market_data_service)
 portfolio_service = PortfolioService(market_data_service)
 backtest_service = BacktestService(market_data_service)
-@app.get("/", response_class=HTMLResponse)
-def dashboard() -> str:
-    return render_dashboard()
+
+
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "status": "ok",
+        "service": "trenda-api",
+        "message": "Deploy the frontend separately on Vercel and point it at this API.",
+    }
 
 
 @app.get("/health")

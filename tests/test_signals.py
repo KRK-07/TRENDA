@@ -56,17 +56,25 @@ def test_backtest_service_runs_with_synthetic_prices() -> None:
     assert len(response.strategy_curve) == len(frame)
 
 
-def test_dashboard_page_is_served() -> None:
+def test_root_returns_api_status() -> None:
     client = TestClient(app)
 
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "Trenda Control Center" in response.text
-    assert "signal-form" in response.text
-    assert "Live polling" in response.text
-    assert "Poll interval" in response.text
-    assert "Watchlist" in response.text
+    assert response.json()["status"] == "ok"
+    assert response.json()["service"] == "trenda-api"
+
+
+def test_frontend_page_is_present() -> None:
+    from pathlib import Path
+
+    frontend = Path(__file__).resolve().parents[1] / "frontend" / "index.html"
+
+    assert frontend.exists()
+    text = frontend.read_text(encoding="utf-8")
+    assert "API base URL" in text
+    assert "trenda-api-base-url" in text
 
 
 def test_vercel_entrypoint_exposes_app() -> None:

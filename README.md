@@ -21,24 +21,41 @@ It starts as a Python API for:
 
 1. Install dependencies.
 2. Start the API with `uvicorn trenda.main:app --reload`.
-3. Open `http://127.0.0.1:8000/` for the dashboard or `http://127.0.0.1:8000/docs` for the API docs.
-4. Leave the dashboard open to let the live polling panel refresh market data every 30 seconds.
+3. Open `http://127.0.0.1:8000/docs` for the API docs.
+4. Open `frontend/index.html` in a browser and set the API base URL to `http://127.0.0.1:8000`.
 
-## Deploy on Vercel
+## Deploy Frontend and Backend Separately
 
-Trenda is configured to run as a Python serverless app on Vercel.
+This repository now supports a split deployment:
+
+- Backend on Render
+- Frontend on Vercel
+
+### Backend on Render
 
 1. Push this repository to GitHub.
-2. Import the repo into Vercel.
-3. Keep the default framework detection off and let Vercel use `vercel.json`.
-4. Deploy the project using the Python runtime.
+2. In Render, create a new Web Service from the repo.
+3. Set the root directory to the repository root.
+4. Use the build command `pip install .`.
+5. Use the start command `uvicorn trenda.main:app --host 0.0.0.0 --port 10000`.
+6. Deploy the service.
 
-The deployment uses `api/index.py` as the entrypoint and rewrites all routes to the FastAPI app, so the dashboard still loads at `/` and the API remains available under the same paths.
+### Frontend on Vercel
+
+1. In Vercel, create a new project from the same GitHub repo.
+2. Set the root directory to `frontend`.
+3. Deploy the project as a static site.
+4. After deployment, open the site and paste your Render API URL into the `API base URL` field.
+5. Save it once. The value is stored in the browser and reused for live polling.
+
+### CORS
+
+The backend allows cross-origin requests so the Vercel frontend can call the Render API. If you want to restrict it, set `TRRENDA_ALLOWED_ORIGINS` on Render to your Vercel domain.
 
 ## Endpoints
 
-- `GET /health`
 - `GET /`
+- `GET /health`
 - `GET /market/{symbol}`
 - `GET /market/live/{symbol}`
 - `GET /signals/{symbol}`
