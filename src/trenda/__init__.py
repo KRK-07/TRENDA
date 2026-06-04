@@ -1,0 +1,1 @@
+"""Trenda application package."""
